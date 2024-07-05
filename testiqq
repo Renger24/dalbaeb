@@ -6,15 +6,26 @@ ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 -- Создаем Frame с белым фоном
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 250, 0, 300)
-Frame.Position = UDim2.new(0.5, -125, 0.5, -150)
 Frame.BackgroundColor3 = Color3.new(1, 1, 1)
 Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.5, -125, 0.5, -150)
+Frame.Draggable = true -- Включаем возможность перемещения
 Frame.Parent = ScreenGui
+
+-- Создаем поле для перетаскивания окна
+local DragArea = Instance.new("TextButton")
+DragArea.Size = UDim2.new(1, 0, 0, 30)
+DragArea.BackgroundColor3 = Color3.new(0, 0, 0)
+DragArea.BackgroundTransparency = 0.7
+DragArea.BorderSizePixel = 0
+DragArea.Text = ""
+DragArea.AutoButtonColor = false -- Отключаем автоизменение цвета при наведении курсора
+DragArea.Parent = Frame
 
 -- Создаем TextBox для вывода результата
 local ResultBox = Instance.new("TextBox")
 ResultBox.Size = UDim2.new(0.9, 0, 0.2, 0)
-ResultBox.Position = UDim2.new(0.05, 0, 0.05, 0)
+ResultBox.Position = UDim2.new(0.05, 0, 0.15, 0)
 ResultBox.BackgroundColor3 = Color3.new(1, 1, 1)
 ResultBox.BorderSizePixel = 0
 ResultBox.ClearTextOnFocus = false
@@ -26,6 +37,7 @@ ResultBox.Parent = Frame
 
 -- Создаем функцию для обработки нажатий кнопок
 local function buttonClick(value)
+    -- Операции при нажатии на кнопки
     if value == "=" then
         -- Вычисляем результат и выводим
         local expression = loadstring("return " .. ResultBox.Text)
@@ -42,6 +54,9 @@ local function buttonClick(value)
     elseif value == "C" then
         -- Очищаем поле с результатом
         ResultBox.Text = ""
+    elseif value == "Закрыть" then
+        -- Закрываем окно
+        ScreenGui:Destroy()
     else
         -- Добавляем нажатую кнопку к выражению
         ResultBox.Text = ResultBox.Text .. value
@@ -54,7 +69,7 @@ local buttons = {
     {"4", "5", "6", "*"},
     {"1", "2", "3", "-"},
     {"0", ".", "=", "+"},
-    {"C"}
+    {"C", "Закрыть"}
 }
 
 local buttonSizeX = 0.2
@@ -74,7 +89,7 @@ for i, row in ipairs(buttons) do
         button.Text = value
         button.TextScaled = true
         button.Parent = Frame
-
+        
         -- Привязываем обработчик нажатия кнопки
         button.MouseButton1Click:Connect(function()
             buttonClick(value)
