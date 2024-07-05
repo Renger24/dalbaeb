@@ -1,98 +1,99 @@
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+
 -- Создаем ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "CalculatorGui"
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Name = "CharacterCustomizationGui"
+ScreenGui.Parent = Player.PlayerGui
 
--- Создаем Frame с белым фоном
+-- Создаем Frame с серым фоном и белым текстом
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 250, 0, 300)
-Frame.BackgroundColor3 = Color3.new(1, 1, 1)
+Frame.Size = UDim2.new(0, 300, 0, 250)
+Frame.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5) -- Серый цвет
 Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0.5, -125, 0.5, -150)
-Frame.Draggable = true -- Включаем возможность перемещения
+Frame.Position = UDim2.new(0.5, -150, 0.5, -125)
 Frame.Parent = ScreenGui
 
--- Создаем поле для перетаскивания окна
-local DragArea = Instance.new("TextButton")
-DragArea.Size = UDim2.new(1, 0, 0, 30)
-DragArea.BackgroundColor3 = Color3.new(0, 0, 0)
-DragArea.BackgroundTransparency = 0.7
-DragArea.BorderSizePixel = 0
-DragArea.Text = ""
-DragArea.AutoButtonColor = false -- Отключаем автоизменение цвета при наведении курсора
-DragArea.Parent = Frame
+-- Создаем кнопку "Закрыть" в правом верхнем углу
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -30, 0, 0)
+CloseButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+CloseButton.BorderSizePixel = 0
+CloseButton.Font = Enum.Font.SourceSans
+CloseButton.FontSize = Enum.FontSize.Size24
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.new(1, 1, 1) -- Белый цвет текста
+CloseButton.Parent = Frame
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
 
--- Создаем TextBox для вывода результата
-local ResultBox = Instance.new("TextBox")
-ResultBox.Size = UDim2.new(0.9, 0, 0.2, 0)
-ResultBox.Position = UDim2.new(0.05, 0, 0.15, 0)
-ResultBox.BackgroundColor3 = Color3.new(1, 1, 1)
-ResultBox.BorderSizePixel = 0
-ResultBox.ClearTextOnFocus = false
-ResultBox.Font = Enum.Font.SourceSans
-ResultBox.FontSize = Enum.FontSize.Size24
-ResultBox.Text = ""
-ResultBox.TextScaled = true
-ResultBox.Parent = Frame
-
--- Создаем функцию для обработки нажатий кнопок
-local function buttonClick(value)
-    -- Операции при нажатии на кнопки
-    if value == "=" then
-        -- Вычисляем результат и выводим
-        local expression = loadstring("return " .. ResultBox.Text)
-        if expression then
-            local success, result = pcall(expression)
-            if success then
-                ResultBox.Text = tostring(result)
-            else
-                ResultBox.Text = "Ошибка"
-            end
-        else
-            ResultBox.Text = "Ошибка"
-        end
-    elseif value == "C" then
-        -- Очищаем поле с результатом
-        ResultBox.Text = ""
-    elseif value == "Закрыть" then
-        -- Закрываем окно
-        ScreenGui:Destroy()
-    else
-        -- Добавляем нажатую кнопку к выражению
-        ResultBox.Text = ResultBox.Text .. value
-    end
+-- Функция для изменения высоты персонажа
+local function changeHeight(delta)
+    local humanoidHeight = Humanoid:WaitForChild("HipHeight")
+    humanoidHeight.Value = humanoidHeight.Value + delta
 end
 
--- Создаем таблицу с кнопками и их расположением
-local buttons = {
-    {"7", "8", "9", "/"},
-    {"4", "5", "6", "*"},
-    {"1", "2", "3", "-"},
-    {"0", ".", "=", "+"},
-    {"C", "Закрыть"}
-}
-
-local buttonSizeX = 0.2
-local buttonSizeY = 0.15
-local buttonMargin = 0.02
-
--- Создаем кнопки
-for i, row in ipairs(buttons) do
-    for j, value in ipairs(row) do
-        local button = Instance.new("TextButton")
-        button.Size = UDim2.new(buttonSizeX, -buttonMargin, buttonSizeY, -buttonMargin)
-        button.Position = UDim2.new((j-1)*(buttonSizeX+buttonMargin), buttonMargin, (i-1)*(buttonSizeY+buttonMargin)+0.3, buttonMargin)
-        button.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
-        button.BorderSizePixel = 0
-        button.Font = Enum.Font.SourceSans
-        button.FontSize = Enum.FontSize.Size24
-        button.Text = value
-        button.TextScaled = true
-        button.Parent = Frame
-        
-        -- Привязываем обработчик нажатия кнопки
-        button.MouseButton1Click:Connect(function()
-            buttonClick(value)
-        end)
-    end
+-- Функция для изменения размера головы
+local function changeHeadSize(delta)
+    local headSize = Humanoid:WaitForChild("HeadSize")
+    headSize.Value = headSize.Value + delta
 end
+
+-- Создаем кнопку "Добавить высоту"
+local AddHeightButton = Instance.new("TextButton")
+AddHeightButton.Size = UDim2.new(0.4, -10, 0, 30)
+AddHeightButton.Position = UDim2.new(0.05, 0, 0.15, 0)
+AddHeightButton.BackgroundColor3 = Color3.new(0.7, 0.7, 0.7)
+AddHeightButton.BorderSizePixel = 0
+AddHeightButton.Font = Enum.Font.SourceSans
+AddHeightButton.FontSize = Enum.FontSize.Size18
+AddHeightButton.Text = "Добавить высоту"
+AddHeightButton.Parent = Frame
+AddHeightButton.MouseButton1Click:Connect(function()
+    changeHeight(1)
+end)
+
+-- Создаем кнопку "Уменьшить высоту"
+local ReduceHeightButton = Instance.new("TextButton")
+ReduceHeightButton.Size = UDim2.new(0.4, -10, 0, 30)
+ReduceHeightButton.Position = UDim2.new(0.55, 0, 0.15, 0)
+ReduceHeightButton.BackgroundColor3 = Color3.new(0.7, 0.7, 0.7)
+ReduceHeightButton.BorderSizePixel = 0
+ReduceHeightButton.Font = Enum.Font.SourceSans
+ReduceHeightButton.FontSize = Enum.FontSize.Size18
+ReduceHeightButton.Text = "Уменьшить высоту"
+ReduceHeightButton.Parent = Frame
+ReduceHeightButton.MouseButton1Click:Connect(function()
+    changeHeight(-1)
+end)
+
+-- Создаем кнопку "Сделать голову больше"
+local IncreaseHeadSizeButton = Instance.new("TextButton")
+IncreaseHeadSizeButton.Size = UDim2.new(0.4, -10, 0, 30)
+IncreaseHeadSizeButton.Position = UDim2.new(0.05, 0, 0.35, 0)
+IncreaseHeadSizeButton.BackgroundColor3 = Color3.new(0.7, 0.7, 0.7)
+IncreaseHeadSizeButton.BorderSizePixel = 0
+IncreaseHeadSizeButton.Font = Enum.Font.SourceSans
+IncreaseHeadSizeButton.FontSize = Enum.FontSize.Size18
+IncreaseHeadSizeButton.Text = "Сделать голову больше"
+IncreaseHeadSizeButton.Parent = Frame
+IncreaseHeadSizeButton.MouseButton1Click:Connect(function()
+    changeHeadSize(0.1)
+end)
+
+-- Создаем кнопку "Уменьшить голову"
+local ReduceHeadSizeButton = Instance.new("TextButton")
+ReduceHeadSizeButton.Size = UDim2.new(0.4, -10, 0, 30)
+ReduceHeadSizeButton.Position = UDim2.new(0.55, 0, 0.35, 0)
+ReduceHeadSizeButton.BackgroundColor3 = Color3.new(0.7, 0.7, 0.7)
+ReduceHeadSizeButton.BorderSizePixel = 0
+ReduceHeadSizeButton.Font = Enum.Font.SourceSans
+ReduceHeadSizeButton.FontSize = Enum.FontSize.Size18
+ReduceHeadSizeButton.Text = "Уменьшить голову"
+ReduceHeadSizeButton.Parent = Frame
+ReduceHeadSizeButton.MouseButton1Click:Connect(function()
+    changeHeadSize(-0.1)
+end)
