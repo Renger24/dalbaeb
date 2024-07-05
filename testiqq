@@ -1,22 +1,83 @@
+-- Создаем ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ExampleGui"
+ScreenGui.Name = "CalculatorGui"
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
+-- Создаем Frame с белым фоном
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 200, 0, 150)
-Frame.Position = UDim2.new(0.5, -100, 0.5, -75)
+Frame.Size = UDim2.new(0, 250, 0, 300)
+Frame.Position = UDim2.new(0.5, -125, 0.5, -150)
 Frame.BackgroundColor3 = Color3.new(1, 1, 1)
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 
-local CloseButton = Instance.new("TextButton")
-CloseButton.Size = UDim2.new(0, 100, 0, 50)
-CloseButton.Position = UDim2.new(0.5, -50, 0.5, -25)
-CloseButton.BackgroundColor3 = Color3.new(1, 0, 0)
-CloseButton.BorderSizePixel = 0
-CloseButton.Text = "Закрыть"
-CloseButton.Parent = Frame
+-- Создаем TextBox для вывода результата
+local ResultBox = Instance.new("TextBox")
+ResultBox.Size = UDim2.new(0.9, 0, 0.2, 0)
+ResultBox.Position = UDim2.new(0.05, 0, 0.05, 0)
+ResultBox.BackgroundColor3 = Color3.new(1, 1, 1)
+ResultBox.BorderSizePixel = 0
+ResultBox.ClearTextOnFocus = false
+ResultBox.Font = Enum.Font.SourceSans
+ResultBox.FontSize = Enum.FontSize.Size24
+ResultBox.Text = ""
+ResultBox.TextScaled = true
+ResultBox.Parent = Frame
 
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
+-- Создаем функцию для обработки нажатий кнопок
+local function buttonClick(value)
+    if value == "=" then
+        -- Вычисляем результат и выводим
+        local expression = loadstring("return " .. ResultBox.Text)
+        if expression then
+            local success, result = pcall(expression)
+            if success then
+                ResultBox.Text = tostring(result)
+            else
+                ResultBox.Text = "Ошибка"
+            end
+        else
+            ResultBox.Text = "Ошибка"
+        end
+    elseif value == "C" then
+        -- Очищаем поле с результатом
+        ResultBox.Text = ""
+    else
+        -- Добавляем нажатую кнопку к выражению
+        ResultBox.Text = ResultBox.Text .. value
+    end
+end
+
+-- Создаем таблицу с кнопками и их расположением
+local buttons = {
+    {"7", "8", "9", "/"},
+    {"4", "5", "6", "*"},
+    {"1", "2", "3", "-"},
+    {"0", ".", "=", "+"},
+    {"C"}
+}
+
+local buttonSizeX = 0.2
+local buttonSizeY = 0.15
+local buttonMargin = 0.02
+
+-- Создаем кнопки
+for i, row in ipairs(buttons) do
+    for j, value in ipairs(row) do
+        local button = Instance.new("TextButton")
+        button.Size = UDim2.new(buttonSizeX, -buttonMargin, buttonSizeY, -buttonMargin)
+        button.Position = UDim2.new((j-1)*(buttonSizeX+buttonMargin), buttonMargin, (i-1)*(buttonSizeY+buttonMargin)+0.3, buttonMargin)
+        button.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
+        button.BorderSizePixel = 0
+        button.Font = Enum.Font.SourceSans
+        button.FontSize = Enum.FontSize.Size24
+        button.Text = value
+        button.TextScaled = true
+        button.Parent = Frame
+
+        -- Привязываем обработчик нажатия кнопки
+        button.MouseButton1Click:Connect(function()
+            buttonClick(value)
+        end)
+    end
+end
